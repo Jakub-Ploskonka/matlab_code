@@ -1,0 +1,10 @@
+Laboratorium 1 24.03.2025 14.00
+
+Próbkowanie:
+- próbkowanie sygnałów analogowych (deterministycznych),
+- twierdzenie Shannon'a, częstotliwość Nyquista,
+- delta Dirac'a i grzebień Dirac'a,
+- odtwarzanie sygnału ciągłego na podstawie jego próbek,
+- aliasing w dziedzinie czasu,
+- szereg kardynalny Whittakera,
+Próbkowanie sygnałów losowych.
