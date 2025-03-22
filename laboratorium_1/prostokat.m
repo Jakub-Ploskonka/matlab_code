@@ -6,6 +6,6 @@
 
 function prostokat = prostokat(t)
 
-prostokat = zeros(size(t)); % daj wszedzie 0, chyba, ze t miesci sie w zakresie
+prostokat = zeros(size(t)); % daje wszedzie 0, chyba, ze t miesci sie w zakresie
 prostokat (t >= -1/2 & t < 1/2) = 1;
 end
