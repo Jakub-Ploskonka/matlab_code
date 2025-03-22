@@ -1,11 +1,11 @@
 % Autor: Jakub Ploskonka
 % 03 2025
 % Funkcja prostokatna, impuls jednostkowy
-% prostokat(czas/zakres, szerokosc impulsu, wysokosc impulsu)
+% prostokat(czas/zakres)
 % gdy chcemy przesuniecie wzgledem osi to (t + przesuniecie)
 
-function prostokat = prostokat(t,width,height)
+function prostokat = prostokat(t)
 
 prostokat = zeros(size(t)); % daj wszedzie 0, chyba, ze t miesci sie w zakresie
-prostokat (t >= -width/2 & t < width/2) = height;
+prostokat (t >= -1/2 & t < 1/2) = 1;
 end

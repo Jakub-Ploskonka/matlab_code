@@ -8,3 +8,20 @@ Próbkowanie:
 - aliasing w dziedzinie czasu,
 - szereg kardynalny Whittakera,
 Próbkowanie sygnałów losowych.
+
+
+Folder (stare):
+
+1. Napisać funkcje generujące sygnały elementarne (interpretacja analogowa):
+a. impuls prostokątny
+b. impuls trójkątny
+c. skok jednostkowy
+
+Wskazówka — Należy pamiętać, że sygnały w MATLAB’ie są sygnałami cyfrowymi a nie analogowymi!
+
+2. Zaprezentować operacje wzmocnienia, skalowania i przesunięcia na sygnałach z zadania nr 1.
+
+3. Wygenerować sygnały ograniczone w czasie:
+a. sinus ograniczony oknem prostokątnym: amplituda 2, częstotliwość 2 Hz, czas trwania: 2 pełne okresy – t₀ = 0 – 4 pełne okresy,
+
+b. sinus ograniczony oknem trójkątnym: amplituda 4, częstotliwość 3 Hz, czas trwania: 1 pełny okres – t₀ = 0 – 6 pełnych okresów,
