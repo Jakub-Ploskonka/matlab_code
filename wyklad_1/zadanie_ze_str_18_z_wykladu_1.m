@@ -1,6 +1,8 @@
+% zadanie_ze_str_18_z_wykladu_1
 % Autor: Jakub Ploskonka
 % 03 2025
 % Zadanie z 18 str z wykladu nr 1
+% monożenie i dodawanie sygnalow
 
 clear; close all; clc;
 
@@ -15,11 +17,14 @@ s_t_cos = cos(2*pi*(3/100)*t);
 
 s_t_sin = 1/2 * sin(2*pi*(4/50)*t);
 
+
 p_n = s_t_cos .* s_t_sin;
 
 q_n = s_t_cos + s_t_sin;
 
+
 figure (1)
+
 subplot(4,1,1)
 stem(t,s_t_cos, LineWidth=2); grid on; hold on;
 title('Funkcja s_t cos ');
@@ -48,8 +53,8 @@ xlabel('t (czas)'); ylabel('q_n'); hold on;
 plot([min(t) - 0.1 max(t) + 0.1], [0 0], 'k--'); % oś X
 plot([0 0], [min(q_n)-0.1 max(q_n)+0.1], 'k--'); % oś Y
 
-figure (2)
 
+figure (2)
 
 subplot(2,1,1)
 stem(t,p_n, LineWidth=2); grid on; hold on;
