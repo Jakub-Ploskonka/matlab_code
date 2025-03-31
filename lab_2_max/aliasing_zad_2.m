@@ -28,3 +28,45 @@ for i = 1:length(special_fs)
         sprintf('fs = %d Hz\nalias = %.0f Hz', fs_val, f_alias_val), ...
         'Color', 'red');
 end
+
+
+
+
+
+
+f0 = 1000; % Hz
+fs1 = 870; 
+fs2 = 1300;
+fmax = 4000; % maksymalna częstotliwość na wykresie
+k_range = -4:4; % liczba replik
+
+% Przygotowanie widm
+f_axis = -fmax:1:fmax;
+
+figure;
+hold on; grid on;
+
+% Oryginalne widmo (analogowe)
+stem([-f0 f0], [1 1], 'k', 'LineWidth', 2, 'DisplayName', 'Oryginalne widmo f_0=1000Hz');
+
+% Widmo po próbkowaniu fs1
+for k = k_range
+    f1 = k*fs1 + f0;
+    f2 = k*fs1 - f0;
+    stem([f1 f2], [0.7 0.7], 'r', 'LineWidth', 1.5, 'DisplayName', 'fs = 870 Hz'*(k==0));
+end
+
+% Widmo po próbkowaniu fs2
+for k = k_range
+    f1 = k*fs2 + f0;
+    f2 = k*fs2 - f0;
+    stem([f1 f2], [0.4 0.4], 'b', 'LineWidth', 1.5, 'DisplayName', 'fs = 1300 Hz'*(k==0));
+end
+
+xlim([-fmax fmax])
+ylim([0 1.2])
+xlabel('Częstotliwość [Hz]')
+ylabel('Amplituda (umowna)')
+title('Widmo sygnału sinusoidalnego i jego aliasy po próbkowaniu')
+legend('Location', 'northeast')
+
