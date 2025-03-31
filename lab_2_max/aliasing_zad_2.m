@@ -70,3 +70,34 @@ ylabel('Amplituda (umowna)')
 title('Widmo sygnału sinusoidalnego i jego aliasy po próbkowaniu')
 legend('Location', 'northeast')
 
+
+
+
+
+
+f0 = 1000; % Hz
+A = 1;     % amplituda
+fs_list = [870, 1300]; % częstotliwości próbkowania
+f = linspace(-4000, 4000, 4000); % oś częstotliwości
+
+for idx = 1:length(fs_list)
+    fs = fs_list(idx);
+    T = 1/fs;
+    
+    % Składowe sinc widma dla przesunięć o ±f0
+    Xf = (A/2) * (T * sinc(T * (f + f0)) + T * sinc(T * (f - f0)));
+
+    figure;
+    plot(f, Xf, 'c', 'LineWidth', 2);
+    grid on;
+    xlabel('Częstotliwość [Hz]');
+    ylabel('Amplituda');
+    title(['Widmo po okienkowaniu (fs = ' num2str(fs) ' Hz, f_0 = 1000 Hz)']);
+    xlim([-4000 4000]);
+    
+    % Dodanie informacji o filtrze antyaliasingowym
+    text(-2500, max(Xf)*0.9, 'FILTR ANTYALIASINGOWY !!!', ...
+        'FontSize', 14, 'FontWeight', 'bold', 'Color', 'red');
+end
+
+
