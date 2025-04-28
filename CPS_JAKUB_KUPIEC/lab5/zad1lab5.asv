@@ -1,0 +1,65 @@
+close all; clc; clear;
+
+co = ['b', 'r', 'm', 'c', 'y', 'w'];
+na = ["Prostokotne", "Bartletta", "Hanna", "Hamminga", "Blackman", "Flat Top"];
+
+for okno = 0:5
+
+    [xs,fs] = CPS_LAB06_sygnal(2);
+    N = length(xs);
+    win = [rectwin(N), bartlett(N), hann(N), hamming(N), ]
+    col = co(okno+1);
+    naz =na(okno+1);
+    switch okno
+        case 0
+            w = rectwin(N);
+        case 1
+            w = bartlett(N);
+        case 2
+            w = hann(N);
+        case 3
+            w = hamming(N);
+        case 4
+            w = blackman(N);
+        case 5
+            w = flattopwin(N);
+    end
+    w = w';
+    ratio = sum(rectwin(N))/sum(w);
+    disp("Współczynik dla okna "+naz+": "+ratio);
+    to = 0;
+    ts = to:1/fs:(N-1)/fs + to;
+    
+    xs = xs.*w*ratio;
+    
+    f = 0:fs/N:fs - fs/N;
+    XS = fft(xs).';
+    
+    
+    M = 4000;
+    xsr = [xs,zeros(1,M)];
+    XSr = fft(xsr);
+    fr = 0:fs/(N+M):fs - fs/(N+M);
+    
+    
+    %sygnal analogowy
+    dt = 0.00001;
+    ta = to:dt:to+N/fs;
+    xa = zeros(size(ta));
+    for i = 1:N
+        xa = xa + xs(i)*sinc((ta-i*1/fs)*fs);
+    end
+    fa = -fs/2:0.1:fs/2;
+    XA = zeros(size(fa));
+
+    figure(okno+1) 
+        plot(fr,abs(XSr)/N, col, MarkerSize=5);
+        title(naz);
+        xlim([0 300]);
+        set(gca,'Color',[0.1 0.1 0.1]); grid on;
+        ax = gca;
+        ax.GridAlpha = 0.3;
+        ax.GridColor = [1, 1, 1];
+end
+        
+
