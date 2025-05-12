@@ -6,8 +6,8 @@ clc; clear; close all;
 dt = 0.00001;
 f0 = 400;
 f1 = 700;
-fs = 1500;
-N = 100;
+fs = 1000;
+N = 1000;
 to = 0;
 t = to : dt : N/fs;
 s = sin(2*pi*f0*t) + sin(2*pi*f1*t);
@@ -24,4 +24,5 @@ figure(1)
     xlabel('Czestotliwosc');
     ylabel('Amplituda');
     title('Aliasing - zakłócenia widma')
+    plot(500,0,'ro', LineWidth=2); % fs/2
 
