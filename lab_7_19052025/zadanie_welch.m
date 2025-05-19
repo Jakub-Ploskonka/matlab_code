@@ -123,3 +123,44 @@ function [Pxx, f] = myPeriodogram(x, fs)
     Pxx(2:end-1) = 2 * Pxx(2:end-1);% Korekta dla częstotliwości pośrednich
     f = fs * (0:N/2) / N;          % Odpowiadające częstotliwości
 end
+
+
+
+
+
+
+clc; clear; close all;
+
+% Wczytaj sygnał
+[x, fs] = audioread('czerwienszy_02_32_k.wav');
+x = x(:,1); % tylko pierwszy kanał (mono)
+
+% --- Twoja funkcja periodogramu ---
+[Pxx_my, f_my] = myPeriodogram(x, fs);
+
+% --- Wbudowany periodogram MATLAB-a ---
+[Pxx_builtin, f_builtin] = periodogram(x, hamming(length(x)), [], fs);
+
+% --- PSD metodą Bartletta ---
+segmentLength = 1024;
+window_bartlett = rectwin(segmentLength); 
+noverlap_bartlett = 0;
+nfft = segmentLength;
+[Pxx_bartlett, f_bartlett] = pwelch(x, window_bartlett, noverlap_bartlett, nfft, fs, 'psd');
+
+% --- PSD metodą Welcha (z overlapem i oknem Hamminga) ---
+window_welch = hamming(segmentLength);
+noverlap_welch = floor(segmentLength / 2);  % 50% nakładania
+[Pxx_welch, f_welch] = pwelch(x, window_welch, noverlap_welch, nfft, fs, 'psd');
+
+% --- Wykres porównawczy 4 metod ---
+figure;
+plot(f_my, 10*log10(Pxx_my), 'b-', 'LineWidth', 1.2); hold on;
+plot(f_builtin, 10*log10(Pxx_builtin), 'r--', 'LineWidth', 1.2);
+plot(f_bartlett, 10*log10(Pxx_bartlett), 'g-.', 'LineWidth', 1.2);
+plot(f_welch, 10*log10(Pxx_welch), 'm:', 'LineWidth', 2);
+grid on;
+xlabel('Częstotliwość [Hz]');
+ylabel('PSD [dB/Hz]');
+title('Porównanie metod: Periodogram vs Bartlett vs Welch');
+legend('Moja funkcja', 'MATLAB periodogram', 'Bartlett', 'Welch');
