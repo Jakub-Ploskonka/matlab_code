@@ -68,9 +68,29 @@ ylabel('Moc [dB]');
 title('Porównanie: Welch PSD vs. surowa FFT');
 legend('Welch (średnie widmo)', 'Surowa FFT');
 
+% --- Twoja funkcja periodogramu ---
 [Pxx_my, f_my] = myPeriodogram(x, fs);
 
-figure(5)
+% --- Wbudowana funkcja periodogramu (dla porównania) ---
+[~, w] = size(x); % sprawdzenie, czy to mono (kolumna lub wiersz)
+if w > 1
+    x = x(:,1); % tylko pierwszy kanał
+end
+[Pxx_builtin, f_builtin] = periodogram(x, hamming(length(x)), [], fs);
+
+% --- Rysowanie obu na jednym wykresie ---
+figure(5);
+plot(f_my, 10*log10(Pxx_my), 'b-', 'LineWidth', 1.5); hold on;
+plot(f_builtin, 10*log10(Pxx_builtin), 'r--', 'LineWidth', 1.5);
+grid on;
+xlabel('Częstotliwość [Hz]');
+ylabel('PSD [dB/Hz]');
+title('Porównanie: Własna funkcja vs wbudowany periodogram');
+legend('Moja funkcja', 'MATLAB periodogram');
+
+
+
+figure(4)
 plot(f_my, 10*log10(Pxx_my)); grid on;
 xlabel('Częstotliwość [Hz]');
 ylabel('PSD [dB/Hz]');
