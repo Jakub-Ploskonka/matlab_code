@@ -101,7 +101,7 @@ figure(2)
     subplot(2,1,2)
         plot(tl,odp_imp1);
         grid on; hold on;
-        title('Wbudowana odp impulsowa');
+        title('Wbudowana odp  impulsowa');
         xlabel('Czas [s]');
 
 

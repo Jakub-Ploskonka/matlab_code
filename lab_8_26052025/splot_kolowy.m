@@ -41,3 +41,26 @@ b = [b, zeros([1,L-length(b)])];
 
 cc = ifft(fft(a).*fft(b));
 cc = cc(1:L);
+
+
+% FFT bez zmiany K
+Hcz = fft(h, K);
+Hcz_shifted = fftshift(Hcz);
+f = (-K/2 : K/2 - 1) * (fs/K);
+
+% Interpolacja (np. 10x gęściej)
+f_dense = linspace(min(f), max(f), 10*K);  % nowa, gęsta oś
+Hcz_dense = interp1(f, abs(Hcz_shifted), f_dense, 'spline');  % interpolacja modułu
+Hcz_phase_dense = interp1(f, angle(Hcz_shifted)/pi, f_dense, 'spline'); % faza
+
+% Rysowanie
+figure(3);
+    subplot(2,1,1);
+        plot(f_dense, Hcz_dense); grid on;
+        title("Interpolowany moduł |H(f)|");
+        xlabel("Częstotliwość [Hz]");
+
+    subplot(2,1,2);
+        plot(f_dense, Hcz_phase_dense); grid on;
+        title("Interpolowana faza ∠H(f) (w π rad)");
+        xlabel("Częstotliwość [Hz]");
