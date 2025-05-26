@@ -1,41 +1,77 @@
+% Autor Jakub Płoskonka
+% 19 05 2025
+% zadanie 
+% analiza czasowo-czestotliwosciowa sygnalu dzwiekowego z pliku WAV
+
+
 clc; clear; close all;
-%Audioread czerwienszy
+
+% 1 Audioread czerwienszy
 [x,fs]=audioread('czerwienszy_02_32_k.wav');
 
-X=fft(x);
+% 2 Audioread dzdzownica 2
+%[x,fs]=audioread('dzdzownica_02_32_k.wav');
+
+% 3 Audioread dzdzownica 3
+%[x,fs]=audioread('dzdzownica_03_25_m.wav');
+
+X = fft(x); % fft sygnalu
 
 figure(1)
+
 plot(x);
+title('Wykres przebiegu czasowego sygnalu');
+xlabel('Indeksy probek');
+ylabel('Amplituda');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+N = length(x);
+L = 500; % dlugosc okna
+overlap = 100; % nakladanie sie okien (100 probek)
+
+modulo = mod(N, L-2);
+z_amount = L - modulo; 
+x = [x(:); zeros(z_amount,1)]; % dopełnienie zerami do wielokrotności rozmiaru okna
+% Dzielimy sygnał na fragmenty (okna) długości L=500 próbek z nakładaniem się 100 próbek.
+% Jeżeli długość sygnału nie pozwala na pełne podziały, dopełniamy sygnał zerami.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Dzielimy sygnał na okna
+% Tworzymy macierz y, gdzie każdy wiersz to jedno okno sygnału.
 
 N = length(x);
-L = 500;
-overlap=100;
-
-modulo=mod(N,L-2);
-z_amount=L-modulo;
-
-x=[x(:);zeros(z_amount,1)];
-
-N = length(x);
-Q = N/(L-overlap);
-a=L-overlap;
+Q = N / (L-overlap);
+a = L - overlap;
 for q = 1:Q-1
-    y(q,:)=x((q-1)*a+1:(q-1)*a+L);
+    y(q,:) = x((q-1) * a+1 : (q-1)*a+L);
 end
 
-WH=L/sum(hanning(L))
+% Zastosowanie funkcji okna Hanninga
+% Nakładamy funkcję Hanninga na każde okno, aby zmniejszyć efekt przecieków częstotliwościowych
+% WH - współczynnik normalizacji energii (kompensuje tłumienie energii przez okno Hanninga)
+WH = L / sum(hanning(L));
 for q = 1:Q-1
-    y_windowed(q,:)=y(q,:).*hanning(L)';
+    y_windowed(q,:) = y(q,:) .* hanning(L)';
 end
 
-for q = 1:Q-1
-    y_DFT(q,:)=fft(y_windowed(q,:))*WH;
+% Obliczanie FFT dla każdego okna
+
+for q = 1 : Q-1
+    y_DFT(q,:) = fft(y_windowed(q,:)) * WH;
 end
 
+% Budowanie macierzy widma i wyświetlanie spektrogramu
 Y=[y_DFT.'];
 
 figure(2)
+
 imagesc(abs(Y));
 set(gca, 'YTick')
-set(gca, 'YDir', 'normal')
+set(gca, 'YDir', 'normal') % wartosci male na dole wykresy i do gory rosna
+colormap('jet'); % kontrastowa mapa kolorow
 colorbar;
+xlabel('Okno czasowe nr');
+ylabel('Indeks częstotliwości (FFT)');
+% kolory to sila dzwieku na danej czestotliwosci
+
+ sound(x,fs); % dzwiek audio

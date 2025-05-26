@@ -2,8 +2,8 @@
 % 12 05 2025
 % zadanie_2
 
-% Ładuje sygnał z pliku STFT_02.mat
-% Porównuje dwie wersje transformacji STFT (krótkoczasowa transformacja Fouriera):
+% Ładujemy sygnał z pliku STFT_02.mat
+% Porównujemy dwie wersje transformacji STFT (krótkoczasowa transformacja Fouriera):
 % własnoręcznie napisaną funkcję STFT
 % gotową funkcję spectrogram z MATLAB-a
 % spektrogramy (obrazy pokazujące zmiany widma w czasie)
@@ -14,24 +14,24 @@ load STFT_02.mat;
 nfft = 1000;
 frame = 300;
 window = hamming(frame)';
-overlap = 0; % nakładanie ramek = 0 (brak przesunięcia)
+overlap = 0; % nakładanie_ramek = 0 (brak przesunięcia)
 x = x'; % transpozycja sygnału (w razie potrzeby)
 
 [S,f,t] = STFT(x, fs, nfft, window, frame, overlap); % wynik naszego STFT
 [spectro, f_spec, t_spec] = spectrogram(x,window,overlap,nfft,fs,'yaxis'); % wynik STFT  matlabowego
 
 figure(1);
-    imagesc(t,f,abs(S) / nfft);% wyrysowanie naszego STFT normalizacja przez nfft
+    imagesc(t,f,abs(S) / nfft); % wyrysowanie naszego STFT normalizacja przez nfft
     colorbar
     title('Funkcja STFT');
-    clim([0 0.08]); % zakres kolorów (jasność amplitudy)
+    clim([0 0.009]); % zakres kolorów (jasność amplitudy)
     ylim([0  10e3]); % ograniczenie osi Y do 10 kHz
 
 figure(2);
     imagesc(t_spec, f_spec, abs(spectro)/nfft);
     colorbar
     title('Funkcja spectrogram');
-    clim([0 0.08]);
+    clim([0 0.009]);
     ylim([0  10e3]);
 
 
