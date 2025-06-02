@@ -73,4 +73,4 @@ xlabel('Okno czasowe nr');
 ylabel('Indeks częstotliwości (FFT)');
 % kolory to sila dzwieku na danej czestotliwosci
 
- sound(x,fs); % dzwiek audio
+ %sound(x,fs); % dzwiek audio
