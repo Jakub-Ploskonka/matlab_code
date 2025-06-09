@@ -56,8 +56,9 @@ legend('h[n], R = 53');
 figure(4)
 subplot(2,1,1)
     plot(F1,(abs(H1)), 'r', LineWidth=2); grid on; hold on;
-    xline(fp, '--k', 'fp', 'LabelHorizontalAlignment', 'left', 'LabelVerticalAlignment', 'bottom');
-    xline(fr, '--k', 'fr', 'LabelHorizontalAlignment', 'right', 'LabelVerticalAlignment', 'bottom');
+    %xline(fp, '--r', 'fp', LineWidth=1);
+    %xline(fp, '--k', 'fp', 'LabelHorizontalAlignment', 'left', 'LabelVerticalAlignment', 'bottom');
+    %xline(fp, '--k', 'fp', 'LabelHorizontalAlignment', 'left', 'LabelVerticalAlignment', 'bottom');
     xlabel("Frequency (Hz)");
     ylabel("Magnitude");
 subplot(2,1,2)
