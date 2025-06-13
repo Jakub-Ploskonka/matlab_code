@@ -150,3 +150,28 @@ for n=1:L
    A = [h(n),A(1:end-1)];
 end
 end
+
+
+
+
+
+% --- Projektowanie filtru Czebyszewa I rodzaju (analogowego)
+
+% Parametry wejściowe
+fp = 1250;       % częstotliwość końca pasma przepustowego [Hz]
+fr = 1750;       % częstotliwość początku pasma zaporowego [Hz]
+Rp = 2;          % dopuszczalne tłumienie w paśmie przepustowym [dB]
+Rr = 50;         % minimalne tłumienie w paśmie zaporowym [dB]
+fs = 8000;       % częstotliwość próbkowania [Hz]
+
+Wp = 2*pi*fp;    % zamiana na rad/s
+Wr = 2*pi*fr;
+
+% Obliczenie minimalnego rzędu i częstotliwości granicznej filtru
+[N, Wn] = cheb1ord(Wp, Wr, Rp, Rr, 's');  % analogowy filtr
+
+% Obliczenie współczynników filtru analogowego
+[ba, aa] = cheby1(N, Rp, Wn, 's');  % 's' = analogowy filtr
+
+% Transmitancja
+[za, pa, ka] = tf2zp(ba, aa);
