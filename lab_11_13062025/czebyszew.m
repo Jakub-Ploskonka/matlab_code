@@ -1,177 +1,111 @@
-% --- Własna implementacja prototypu filtru Czebyszewa I rodzaju
+% zadanie 3
 
-fp = 1250;
-fr = 1750; 
-Rp = 2; 
-Rr = 50;
-fs = 8000;
+fp=335;
+fr=495;
+fs=1800;
+Rr=47;
+Rp=2;
 
-Wp = 2*pi*fp;   % rad/s
-Wr = 2*pi*fr;
+wp = 2*pi*fp;  
+wr = 2*pi*fr;
 
-% Oblicz współczynnik epsilon na podstawie tłumienia w paśmie przepustowym
-ep = sqrt(10^(Rp/10) - 1);
+A = acosh(sqrt((10^(Rr/10)-1)/(10^(Rp/10)-1)));
+B = acosh(fr/fp);
 
-% Oblicz rząd filtru (N) – wzór z definicji
-N_real = acosh(sqrt((10^(Rr/10) - 1) / (10^(Rp/10) - 1))) / acosh(Wr/Wp);
-N = ceil(N_real);  % zaokrąglony rząd filtru
+N = ceil(A/B);
 
-% Oblicz bieguny filtru Czebyszewa I rodzaju
-k = 1:N;
-beta = asinh(1/ep)/N;
-
-% Prototypowe bieguny (normalizowane, dla omega_c = 1 rad/s)
-pk = -sin(pi*(2*k - 1)/(2*N)) * sinh(beta) + 1i * cos(pi*(2*k - 1)/(2*N)) * cosh(beta);
-
-% Skalowanie do częstotliwości granicznej ωp
-omega_c = Wp / ( (1/ep)^(1/N) );  % korekta skalowania
-pa = omega_c * pk;
-za = [];  % brak zer w Czebyszewie I rodzaju
-ka = real(prod(-pa));  % wzmocnienie – filtr stabilny
-
-[ba, aa] = zp2tf(za, pa, ka);  % transmitancja filtru analogowego
+eps=sqrt(10^(Rp/10)-1);
+r = sinh((1/N)*asinh(1/eps));
+R = cosh((1/N)*asinh(1/eps));
 
 
+poles = [];
+for k = 1:N
+    theta_k = pi*(2*k - 1)/(2*N);
+    real_part = -wp * r * sin(theta_k);
+    imag_part =  wp * R * cos(theta_k);
+    p = real_part + 1j*imag_part;
+    poles = [poles; p];
+end
+
+poles = poles(real(poles) < 0);
+
+
+aa = poly(poles);   
+ba = prod(-poles);  
+ba = real(ba);
+
+
+[Ha, Fa] = freqs(ba, aa, 2*pi* linspace(0,fs/2,100000));
 iir_1;
+iir_2;
 
-[Ha, Fa] = freqs(ba, aa, 2*pi*linspace(0,fs,5e+3)); % Charakterystyka częstotliwościowa filtru analogowego
-iir_2
+ta=linspace(0,30e-3,1e3);
+ha = PA_impulse(ba,aa,ta);
 
-% Transformacja biliniowa – przekształcenie do postaci cyfrowej  
+figure(4)
+plot(ta,ha,'b'); hold on; grid on;
 
-Ts = 1/fs;
+figure(5) % Wykresy zera-biegun
+zplane([],poles); % Analogowy
+grid
 
-[r,p,K] = residue(ba,aa);
+% met zach odp imp b1 a1 STAB
+Ts=1/fs;
 
+[r,p,K] = residue(b,a);
 licznik = Ts*r;
 mianownik = exp(Ts*p);
 
 [b1,a1] = residue(licznik,mianownik,K);
+b1 = real(b1);
 
-% Oblicza odpowiedź częstotliwościową filtru cyfrowego
-Q = 10000;
-[H1, F1] = freqz(b1,a1,Q,fs); % Charakterystyka cyfrowego filtru
-iir_3
+Q = 4096;
 
-% Impulsowa odpowiedź filtru
-ha = odp_imp_2(ba,aa,50); % Odpowiedź impulsowa filtru analogowego
-h1 = odp_imp_2(b1,a1,50); % Odpowiedź impulsowa filtru cyfrowego
+[H1, F1] = freqz(b1,a1,Q,fs);
+iir_3;
 
+[h1 t1] = impz(b1,a1,max(ta) * fs,fs);
 
-figure(5) % Rysowanie odpowiedzi impulsowej
-stem(real(h1),'b', LineWidth=2); grid on; hold on;
-xlabel('Probka [n]');
-title('Odpowiedź impulsowa filtru cyfrowego');
-
-figure(6) % Wykresy zera-biegun
-zplane(ba,aa); % Analogowy
-grid
-figure(7)
-zplane(b1,a1); % Cyfrowy
-grid
-
-% Sygnał testowy – suma 4 kosinusów o różnych częstotliwościach
-K = 50;
-f100 = 450;
-f200 = 1200;
-f300 = 1800;
-f400 = 3150; 
-Dt = 1/fs;
-tx = 0 : Dt : K*Dt-Dt;
-xs = cos(2*pi* f100 *tx) + cos(2*pi* f200 *tx) + cos(2*pi* f300 *tx) + cos(2*pi* f400 *tx);
-
-y = conv(xs,h1); % , "same" Sygnał wyjściowy po filtracji
-
-figure(9) % Wykresy sygnałów: wejściowego, odpowiedzi i wyjściowego
-subplot(3,1,1);
-    stem(xs,"r", LineWidth=2); grid on; hold on;
-    title("Wykres sygnału wejściowego x[n]"); % x[n]
-    xlabel('Probka [n]'); ylabel('Magnitude');
-subplot(3,1,2);
-    stem(real(h1),"g", LineWidth=2); grid on; hold on;
-    title("Odpowiedź impulsowa filtru h[n]"); % h[n]
-    xlabel('Probka [n]');
-subplot(3,1,3);
-    stem(real(y),"b", LineWidth=2); grid on; hold on;
-    title("Sygnał wyjściowy y[n] = x[n] * h[n]"); % y[n]
-
-% Analiza w dziedzinie częstotliwości (FFT)
-% Realizuje filtrację w dziedzinie częstotliwości przez mnożenie FFT
-Df = fs/K;
-f = 0:Df:Df*K-Df;
-
-% Wykresy widm: X, H, Y
-H = fft(h1);
-X = fft(xs);
-Y = X.*H;
-
-figure(10)
-subplot(3,1,1); 
-    stem(f,abs(X),"r", LineWidth=2); grid on; hold on;
-    xlim([0,fs/2]);
-    xlabel('Frequency [Hz]'); ylabel('Magnitude');
-    title("X – widmo sygnału wejściowego xs");
-subplot(3,1,2);
-    stem(f,abs(H),"b", LineWidth=2); grid on; hold on;
-    xlim([0,fs/2]);
-    title("H – widmo filtru cyfrowego h1");
-    xlabel('Frequency [Hz]'); ylabel('Magnitude');
-subplot(3,1,3);
-    stem(f,abs(Y),"blue", LineWidth=2); grid on; hold on;
-    xlim([0,fs/2]);
-    title("Y – widmo sygnału po filtracji: y = x * h");
-    xlabel('Frequency [Hz]'); ylabel('Magnitude');
-
-figure(11) % Porównanie odpowiedzi analogowej i cyfrowej filtru
-plot(Fa/(2*pi), 20*log10(abs(Ha)), 'b', LineWidth=2); hold on;
-plot(F1, 20*log10(abs(H1)), 'r', LineWidth=2); hold off;
-xlim([0, fs/2]);
-xlabel('Frequency (Hz)');
-ylabel('Magnitude (dB)');
-legend('Ha - analog', 'H1 - cyfra');
-title('Porównanie odpowiedzi analogowej i cyfrowej filtru - transmitancja ');
-grid on;
+figure(4) 
+    stem(t1, h1*fs, 'rx'); hold on; grid on;
 
 
+% transformacja biliniowa b2 a2 STAB
 
-% Funkcje
-
-% odp_imp_2
-function h = odp_imp_2(b,a,L)
-
-h = zeros(1,L);
-B = zeros(1,length(b));
-A = zeros(1,length(a)-1);
-B(1) = 1;
-
-for n=1:L
-   h(n) = sum(b.*B)-sum(a(2:end).*A);
-   B = [0,B(1:end-1)];
-   A = [h(n),A(1:end-1)];
+for k = 1 : length(poles)
+    pd(k) = (1 + poles(k)*Ts/2) / (1-poles(k) * Ts/2);
 end
-end
+            
+
+zd = -ones(N,1);
+
+kd = ka*(prod(2*fs-za))/(prod(2*fs-poles));
+
+[b2, a2] = zp2tf(zd,pd,kd);
+
+
+[H2, F2] = freqz(b2,a2,4096,fs);
+
+iir_4;
+
+[h2 t2]=impz(b2,a2,max(ta)*fs,fs);
+
+figure(4); hold on;
+stem(t2, h2*fs,'gx')
 
 
 
 
 
-% --- Projektowanie filtru Czebyszewa I rodzaju (analogowego)
 
-% Parametry wejściowe
-fp = 1250;       % częstotliwość końca pasma przepustowego [Hz]
-fr = 1750;       % częstotliwość początku pasma zaporowego [Hz]
-Rp = 2;          % dopuszczalne tłumienie w paśmie przepustowym [dB]
-Rr = 50;         % minimalne tłumienie w paśmie zaporowym [dB]
-fs = 8000;       % częstotliwość próbkowania [Hz]
 
-Wp = 2*pi*fp;    % zamiana na rad/s
-Wr = 2*pi*fr;
 
-% Obliczenie minimalnego rzędu i częstotliwości granicznej filtru
-[N, Wn] = cheb1ord(Wp, Wr, Rp, Rr, 's');  % analogowy filtr
 
-% Obliczenie współczynników filtru analogowego
-[ba, aa] = cheby1(N, Rp, Wn, 's');  % 's' = analogowy filtr
 
-% Transmitancja
-[za, pa, ka] = tf2zp(ba, aa);
+
+
+
+
+
+
